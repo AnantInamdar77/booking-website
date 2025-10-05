@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speed Post Article Booking</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .header {
+      background-color: #a52a2a;
+      color: white;
+      padding: 10px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+    }
+    .logo img {
+      height: 40px;
+      width: auto;
+    }
+    .header h1 {
+      margin: 0 10px;
+      font-size: 24px;
+    }
+    .subtitle {
+      font-size: 14px;
+      display: block;
+    }
+    .nav-bar {
+      background-color: #ffd700;
+      padding: 5px;
+    }
+    .main-content {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border: 1px solid #a52a2a;
+    }
+    h2 {
+      color: #a52a2a;
+      text-align: center;
+    }
+    .section {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .section h3 {
+      color: #a52a2a;
+      border-bottom: 1px solid #a52a2a;
+      padding-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    td {
+      padding: 5px;
+      vertical-align: top;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    .footer {
+      background: #a52a2a;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 20px;
+    }
+    .buttons {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .buttons button {
+      margin: 5px;
+      padding: 8px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #calculate-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    #reset-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    #result-message {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    #result-message .tick {
+      font-size: 100px;
+      color: green;
+    }
+    #qrcode {
+      margin: 20px auto;
+    }
+    #details-box {
+      text-align: left;
+      display: inline-block;
+      background: #fafafa;
+      padding: 10px;
+      border: 1px dashed #ccc;
+      margin-top: 10px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo"><img src="image.png" alt="India Post Logo" /></div>
+    <h1>INDIAN POST</h1>
+    <span class="subtitle">Post Booking Services</span>
+  </div>
+
+  <div class="nav-bar"></div>
+  <div class="main-content">
+    <h2>Speed Post Article Booking</h2>
+
+    <form id="booking-form">
+      <div class="section">
+        <h3>Article Details</h3>
+        <label for="article-number">Article Number</label>
+        <input type="text" id="article-number" />
+        <h3>Distance and Weight Details</h3>
+        <label for="distance-input">Distance (km)</label>
+        <input type="number" id="distance-input" min="0" required />
+        <label for="weight">Weight (grams)</label>
+        <input type="number" id="weight" min="1" required />
+      </div>
+
+      <div class="section">
+        <h3>From Address (Sender)</h3>
+        <table>
+          <tr>
+            <td><label for="sender-first">First Name</label><input type="text" id="sender-first" required /></td>
+            <td><label for="sender-last">Last Name</label><input type="text" id="sender-last" required /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><label for="sender-addr1">Address</label><input type="text" id="sender-addr1" required /></td>
+          </tr>
+          <tr>
+            <td><label for="sender-city">City</label><input type="text" id="sender-city" required /></td>
+            <td><label for="sender-state">State</label><input type="text" id="sender-state" required /></td>
+          </tr>
+          <tr>
+            <td><label for="sender-pin">PIN Code</label><input type="number" id="sender-pin" required /></td>
+            <td><label for="sender-mobile">Mobile Number</label><input type="number" id="sender-mobile" required /></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="section">
+        <h3>To Address (Addressee)</h3>
+        <table>
+          <tr>
+            <td><label for="recipient-first">First Name</label><input type="text" id="recipient-first" required /></td>
+            <td><label for="recipient-last">Last Name</label><input type="text" id="recipient-last" required /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><label for="recipient-addr1">Address</label><input type="text" id="recipient-addr1" required /></td>
+          </tr>
+          <tr>
+            <td><label for="recipient-city">City</label><input type="text" id="recipient-city" required /></td>
+            <td><label for="recipient-state">State</label><input type="text" id="recipient-state" required /></td>
+          </tr>
+          <tr>
+            <td><label for="recipient-pin">PIN Code</label><input type="number" id="recipient-pin" required /></td>
+            <td><label for="recipient-mobile">Mobile Number</label><input type="number" id="recipient-mobile" required /></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <button type="button" id="calculate-btn">Calculate</button>
+        <button type="reset" id="reset-btn">Reset</button>
+      </div>
+    </form>
+
+    <div id="result-message">
+      <div class="tick">✔</div>
+      <h3 style="color: green;">Calculation completed successfully!</h3>
+      <div id="details-box"></div>
+      <div id="qrcode"></div>
+      <button id="submit-btn" style="background:#28a745;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">Submit</button>
+    </div>
+  </div>
+
+  <div class="footer">Department of Posts, Government of India</div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script>
+    const rates = [
+      { weight: 50, local: 18, upto200: 41, "201-1000": 41, "1001-2000": 41, above2000: 41 },
+      { weight: 200, local: 30, upto200: 41, "201-1000": 47, "1001-2000": 71, above2000: 83 },
+      { weight: 500, local: 35, upto200: 59, "201-1000": 71, "1001-2000": 94, above2000: 106 },
+      { weight: 1000, local: 47, upto200: 77, "201-1000": 106, "1001-2000": 142, above2000: 165 },
+      { weight: 2000, local: 71, upto200: 112, "201-1000": 177, "1001-2000": 236, above2000: 283 }
+    ];
+
+    const bookingForm = document.getElementById("booking-form");
+    const resultMessage = document.getElementById("result-message");
+    const qrcodeDiv = document.getElementById("qrcode");
+    const detailsBox = document.getElementById("details-box");
+    const submitBtn = document.getElementById("submit-btn");
+
+    document.getElementById("calculate-btn").addEventListener("click", function () {
+      const weight = parseInt(document.getElementById("weight").value);
+      const km = parseFloat(document.getElementById("distance-input").value);
+
+      if (isNaN(weight) || isNaN(km)) {
+        alert("Please enter valid weight and distance.");
+        return;
+      }
+
+      let column;
+      if (km === 0) column = "local";
+      else if (km <= 200) column = "upto200";
+      else if (km <= 1000) column = "201-1000";
+      else if (km <= 2000) column = "1001-2000";
+      else column = "above2000";
+
+      let rateRow = rates.find(r => weight <= r.weight);
+      if (!rateRow) {
+        alert("Weight exceeds supported range.");
+        return;
+      }
+
+      const amount = rateRow[column];
+      const sender = {
+        first: document.getElementById("sender-first").value,
+        last: document.getElementById("sender-last").value,
+        addr: document.getElementById("sender-addr1").value,
+        city: document.getElementById("sender-city").value,
+        state: document.getElementById("sender-state").value,
+        pin: document.getElementById("sender-pin").value,
+        mobile: document.getElementById("sender-mobile").value
+      };
+      const recipient = {
+        first: document.getElementById("recipient-first").value,
+        last: document.getElementById("recipient-last").value,
+        addr: document.getElementById("recipient-addr1").value,
+        city: document.getElementById("recipient-city").value,
+        state: document.getElementById("recipient-state").value,
+        pin: document.getElementById("recipient-pin").value,
+        mobile: document.getElementById("recipient-mobile").value
+      };
+
+      const details = `
+Distance: ${km} km
+Postage Amount: ₹${amount}
+Weight: ${weight} grams
+
+FROM:
+${sender.first} ${sender.last}
+${sender.addr}
+${sender.city}, ${sender.state}
+PIN: ${sender.pin}, Mobile: ${sender.mobile}
+
+TO:
+${recipient.first} ${recipient.last}
+${recipient.addr}
+${recipient.city}, ${recipient.state}
+PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
+`;
+
+      detailsBox.innerText = details;
+      qrcodeDiv.innerHTML = "";
+      new QRCode(qrcodeDiv, {
+        text: JSON.stringify({ weight, distance: km, amount, from: sender, to: recipient }),
+        width: 220,
+        height: 220
+      });
+
+      bookingForm.style.display = "none";
+      resultMessage.style.display = "block";
+    });
+
+    submitBtn.addEventListener("click", function () {
+      resultMessage.innerHTML = `
+        <div class="tick">✔</div>
+        <h2 style="color:green;">Booking Submitted Successfully!</h2>
+        <p>Press <b>Enter</b> or click below to make a new booking.</p>
+        <button id="fresh-btn" style="background:#007bff;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">New Booking</button>
+      `;
+
+      document.addEventListener("keydown", function handler(e) {
+        if (e.key === "Enter") {
+          window.location.reload();
+          document.removeEventListener("keydown", handler);
+        }
+      });
+
+      document.getElementById("fresh-btn").addEventListener("click", () => {
+        window.location.reload();
+      });
+    });
+  </script>
+</body>
+</html>
