@@ -204,6 +204,7 @@
       <h3 style="color: green;">Calculation completed successfully!</h3>
       <div id="details-box"></div>
       <div id="qrcode"></div>
+      <button id="edit-btn" style="background:#ffc107;color:black;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">Edit Details</button>
       <button id="submit-btn" style="background:#28a745;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">Submit</button>
     </div>
   </div>
@@ -225,6 +226,7 @@
     const qrcodeDiv = document.getElementById("qrcode");
     const detailsBox = document.getElementById("details-box");
     const submitBtn = document.getElementById("submit-btn");
+    const editBtn = document.getElementById("edit-btn");
 
     document.getElementById("calculate-btn").addEventListener("click", function () {
       const weight = parseInt(document.getElementById("weight").value);
@@ -296,6 +298,11 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
 
       bookingForm.style.display = "none";
       resultMessage.style.display = "block";
+    });
+
+    editBtn.addEventListener("click", function () {
+      bookingForm.style.display = "block";
+      resultMessage.style.display = "none";
     });
 
     submitBtn.addEventListener("click", function () {
