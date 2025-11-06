@@ -278,10 +278,10 @@
       <h3 style="color: green;">Calculation completed successfully!</h3>
       <div id="details-box"></div>
       <div id="qrcode"></div>
-      <p id="upi-instruction">Scan this QR with any UPI app to pay ₹<span id="pay-amount"></span>. After payment, enter the exact <strong>Transaction Note</strong> you see in your UPI confirmation (e.g., "Parcel-1234") below to confirm.</p>
+      <p id="upi-instruction">Scan this QR with any UPI app to pay ₹<span id="pay-amount"></span>. After payment, enter the exact <strong>Transaction Note</strong> you see in your UPI confirmation (e.g., "1234") below to confirm.</p>
       <div id="note-section">
         <p><strong>Enter Transaction Note:</strong> (Copy exactly from your UPI app's payment success screen)</p>
-        <input type="text" id="note-input" placeholder="e.g., Parcel-1234" />
+        <input type="text" id="note-input" placeholder="e.g., 1234" />
         <button id="verify-note-btn">Verify & Confirm</button>
         <p id="note-status"></p>
       </div>
@@ -399,8 +399,8 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
 
       detailsBox.innerText = bookingDetails;
 
-      // Generate unique transaction note based on article number (small: "Parcel-{article}")
-      generatedNote = `Parcel-${articleNumber}`;
+      // Generate unique transaction note based on article number (only the number)
+      generatedNote = articleNumber;
       const upiUrl = `upi://pay?pa=anantinamdar77@oksbi&pn=My%20Courier%20Service&am=${calculatedAmount}&cu=INR&tn=${encodeURIComponent(generatedNote)}`;
       qrcodeDiv.innerHTML = "";
       new QRCode(qrcodeDiv, {
