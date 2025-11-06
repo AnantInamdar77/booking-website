@@ -78,6 +78,10 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
+    #article-number {
+      background-color: #f8f9fa;
+      font-weight: bold;
+    }
     .footer {
       background: #a52a2a;
       color: white;
@@ -126,6 +130,76 @@
       margin-top: 10px;
       white-space: pre-wrap;
     }
+    #upi-instruction {
+      text-align: center;
+      font-size: 16px;
+      margin: 10px 0;
+      color: #333;
+    }
+    #note-section {
+      display: none;
+      margin: 20px 0;
+      padding: 10px;
+      background: #e9ecef;
+      border-radius: 5px;
+      text-align: left;
+    }
+    #note-section input {
+      width: 100%;
+      padding: 8px;
+      margin: 10px 0;
+      box-sizing: border-box;
+    }
+    #verify-note-btn {
+      background: #007bff;
+      color: white;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #note-status {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 2s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .action-buttons {
+      margin-top: 20px;
+    }
+    .action-buttons button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #edit-btn {
+      background: #ffc107;
+      color: black;
+    }
+    #submit-btn {
+      background: #28a745;
+      color: white;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -142,8 +216,8 @@
     <form id="booking-form">
       <div class="section">
         <h3>Article Details</h3>
-        <label for="article-number">Article Number</label>
-        <input type="text" id="article-number" />
+        <label for="article-number">Article Number <span style="color: green;">(Auto-generated on load)</span></label>
+        <input type="text" id="article-number" readonly />
         <h3>Distance and Weight Details</h3>
         <label for="distance-input">Distance (km)</label>
         <input type="number" id="distance-input" min="0" required />
@@ -204,8 +278,21 @@
       <h3 style="color: green;">Calculation completed successfully!</h3>
       <div id="details-box"></div>
       <div id="qrcode"></div>
-      <button id="edit-btn" style="background:#ffc107;color:black;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;margin-right:10px;">Edit Details</button>
-      <button id="submit-btn" style="background:#28a745;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">Submit</button>
+      <p id="upi-instruction">Scan this QR with any UPI app to pay ₹<span id="pay-amount"></span>. After payment, enter the exact <strong>Transaction Note</strong> you see in your UPI confirmation (e.g., "Parcel-1234") below to confirm.</p>
+      <div id="note-section">
+        <p><strong>Enter Transaction Note:</strong> (Copy exactly from your UPI app's payment success screen)</p>
+        <input type="text" id="note-input" placeholder="e.g., Parcel-1234" />
+        <button id="verify-note-btn">Verify & Confirm</button>
+        <p id="note-status"></p>
+      </div>
+      <div class="loading" id="loading-spinner">
+        <div class="spinner"></div>
+        <p>Verifying note...</p>
+      </div>
+      <div class="action-buttons">
+        <button id="edit-btn">Edit Details</button>
+        <button id="submit-btn">Submit</button>
+      </div>
     </div>
   </div>
 
@@ -225,15 +312,37 @@
     const resultMessage = document.getElementById("result-message");
     const qrcodeDiv = document.getElementById("qrcode");
     const detailsBox = document.getElementById("details-box");
+    const payAmountSpan = document.getElementById("pay-amount");
+    const noteSection = document.getElementById("note-section");
+    const noteInput = document.getElementById("note-input");
+    const verifyNoteBtn = document.getElementById("verify-note-btn");
+    const noteStatus = document.getElementById("note-status");
+    const loadingSpinner = document.getElementById("loading-spinner");
     const submitBtn = document.getElementById("submit-btn");
     const editBtn = document.getElementById("edit-btn");
 
+    let calculatedAmount = 0;
+    let bookingDetails = '';
+    let generatedNote = ''; // To store the unique note for verification
+
+    // Generate random 4-digit article number on page load
+    window.addEventListener('load', function() {
+      const randomArticle = Math.floor(1000 + Math.random() * 9000).toString(); // 1000-9999
+      document.getElementById("article-number").value = randomArticle;
+    });
+
     document.getElementById("calculate-btn").addEventListener("click", function () {
+      const articleNumber = document.getElementById("article-number").value.trim();
       const weight = parseInt(document.getElementById("weight").value);
       const km = parseFloat(document.getElementById("distance-input").value);
 
       if (isNaN(weight) || isNaN(km)) {
         alert("Please enter valid weight and distance.");
+        return;
+      }
+
+      if (!articleNumber) {
+        alert("Article Number is required.");
         return;
       }
 
@@ -250,7 +359,7 @@
         return;
       }
 
-      const amount = rateRow[column];
+      calculatedAmount = rateRow[column];
       const sender = {
         first: document.getElementById("sender-first").value,
         last: document.getElementById("sender-last").value,
@@ -270,9 +379,9 @@
         mobile: document.getElementById("recipient-mobile").value
       };
 
-      const details = `
+      bookingDetails = `
 Distance: ${km} km
-Postage Amount: ₹${amount}
+Postage Amount: ₹${calculatedAmount}
 Weight: ${weight} grams
 
 FROM:
@@ -288,28 +397,80 @@ ${recipient.city}, ${recipient.state}
 PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
 `;
 
-      detailsBox.innerText = details;
+      detailsBox.innerText = bookingDetails;
+
+      // Generate unique transaction note based on article number (small: "Parcel-{article}")
+      generatedNote = `Parcel-${articleNumber}`;
+      const upiUrl = `upi://pay?pa=anantinamdar77@oksbi&pn=My%20Courier%20Service&am=${calculatedAmount}&cu=INR&tn=${encodeURIComponent(generatedNote)}`;
       qrcodeDiv.innerHTML = "";
       new QRCode(qrcodeDiv, {
-        text: JSON.stringify({ weight, distance: km, amount, from: sender, to: recipient }),
+        text: upiUrl,
         width: 220,
         height: 220
       });
+
+      // Set payment amount in instruction text
+      payAmountSpan.innerText = calculatedAmount;
+
+      // Show note section after QR
+      noteSection.style.display = 'block';
+      noteInput.value = ''; // Clear input
+      noteStatus.textContent = ''; // Clear status
+
+      // Reset submit button and loading
+      submitBtn.style.display = 'none';
+      loadingSpinner.style.display = 'none';
 
       bookingForm.style.display = "none";
       resultMessage.style.display = "block";
     });
 
+    // Handle note verification
+    verifyNoteBtn.addEventListener('click', function() {
+      const enteredNote = noteInput.value.trim();
+      if (!enteredNote) {
+        noteStatus.textContent = 'Please enter the Transaction Note.';
+        noteStatus.style.color = 'red';
+        return;
+      }
+      // Strict match: Must be exact to generated note
+      if (enteredNote !== generatedNote) {
+        noteStatus.textContent = 'Transaction Note does not match. Please copy it exactly from your UPI confirmation screen.';
+        noteStatus.style.color = 'red';
+        return;
+      }
+
+      // Show loading
+      loadingSpinner.style.display = 'block';
+      verifyNoteBtn.disabled = true;
+      noteStatus.textContent = '';
+
+      // Simulate verification delay
+      setTimeout(() => {
+        loadingSpinner.style.display = 'none';
+        noteStatus.textContent = `Note "${generatedNote}" verified! Payment confirmed—proceed to submit.`;
+        noteStatus.style.color = 'green';
+        // Hide note section after
+        noteSection.innerHTML = '<p style="color: green;">Payment confirmed—submit now.</p>';
+        submitBtn.style.display = 'inline-block';
+      }, 1500);
+    });
+
     editBtn.addEventListener("click", function () {
       bookingForm.style.display = "block";
       resultMessage.style.display = "none";
+      // Reset displays for next time
+      noteSection.style.display = "none";
+      loadingSpinner.style.display = "none";
+      generatedNote = ''; // Reset for next session
     });
+    
 
     submitBtn.addEventListener("click", function () {
       resultMessage.innerHTML = `
         <div class="tick">✔</div>
         <h2 style="color:green;">Booking Submitted Successfully!</h2>
-        <p>Press <b>Enter</b> or click below to make a new booking.</p>
+        <p>We'll contact you soon for pickup. Press <b>Enter</b> or click below for new booking.</p>
         <button id="fresh-btn" style="background:#007bff;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">New Booking</button>
       `;
 
