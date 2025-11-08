@@ -71,6 +71,7 @@
     }
     input[type="text"],
     input[type="number"],
+    input[type="password"],
     select,
     textarea {
       width: 100%;
@@ -81,6 +82,26 @@
     #article-number {
       background-color: #f8f9fa;
       font-weight: bold;
+    }
+    .article-container {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    #article-number {
+      flex: 1;
+      margin-right: 5px;
+    }
+    #toggle-article {
+      background: none;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 5px;
+      color: #666;
+    }
+    #toggle-article:hover {
+      color: #000;
     }
     .footer {
       background: #a52a2a;
@@ -208,23 +229,23 @@
     <h1>INDIAN POST</h1>
     <span class="subtitle">Post Booking Services</span>
   </div>
-
   <div class="nav-bar"></div>
   <div class="main-content">
     <h2>Speed Post Article Booking</h2>
-
     <form id="booking-form">
       <div class="section">
         <h3>Article Details</h3>
         <label for="article-number">Article Number <span style="color: green;">(Auto-generated on load)</span></label>
-        <input type="text" id="article-number" readonly />
+        <div class="article-container">
+          <input type="password" id="article-number" readonly />
+          <button type="button" id="toggle-article">👁</button>
+        </div>
         <h3>Distance and Weight Details</h3>
         <label for="distance-input">Distance (km)</label>
         <input type="number" id="distance-input" min="0" required />
         <label for="weight">Weight (grams)</label>
         <input type="number" id="weight" min="1" required />
       </div>
-
       <div class="section">
         <h3>From Address (Sender)</h3>
         <table>
@@ -245,7 +266,6 @@
           </tr>
         </table>
       </div>
-
       <div class="section">
         <h3>To Address (Addressee)</h3>
         <table>
@@ -266,13 +286,11 @@
           </tr>
         </table>
       </div>
-
       <div class="buttons">
         <button type="button" id="calculate-btn">Calculate</button>
         <button type="reset" id="reset-btn">Reset</button>
       </div>
     </form>
-
     <div id="result-message">
       <div class="tick">✔</div>
       <h3 style="color: green;">Calculation completed successfully!</h3>
@@ -295,9 +313,7 @@
       </div>
     </div>
   </div>
-
   <div class="footer">Department of Posts, Government of India</div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script>
     const rates = [
@@ -307,7 +323,6 @@
       { weight: 1000, local: 47, upto200: 77, "201-1000": 106, "1001-2000": 142, above2000: 165 },
       { weight: 2000, local: 71, upto200: 112, "201-1000": 177, "1001-2000": 236, above2000: 283 }
     ];
-
     const bookingForm = document.getElementById("booking-form");
     const resultMessage = document.getElementById("result-message");
     const qrcodeDiv = document.getElementById("qrcode");
@@ -320,45 +335,48 @@
     const loadingSpinner = document.getElementById("loading-spinner");
     const submitBtn = document.getElementById("submit-btn");
     const editBtn = document.getElementById("edit-btn");
-
     let calculatedAmount = 0;
     let bookingDetails = '';
     let generatedNote = ''; // To store the unique note for verification
-
     // Generate random 4-digit article number on page load
     window.addEventListener('load', function() {
       const randomArticle = Math.floor(1000 + Math.random() * 9000).toString(); // 1000-9999
       document.getElementById("article-number").value = randomArticle;
     });
-
+    // Toggle article number visibility
+    document.getElementById("toggle-article").addEventListener("click", function() {
+      const articleInput = document.getElementById("article-number");
+      if (articleInput.type === "password") {
+        articleInput.type = "text";
+        this.textContent = "🙈";
+      } else {
+        articleInput.type = "password";
+        this.textContent = "👁";
+      }
+    });
     document.getElementById("calculate-btn").addEventListener("click", function () {
       const articleNumber = document.getElementById("article-number").value.trim();
       const weight = parseInt(document.getElementById("weight").value);
       const km = parseFloat(document.getElementById("distance-input").value);
-
       if (isNaN(weight) || isNaN(km)) {
         alert("Please enter valid weight and distance.");
         return;
       }
-
       if (!articleNumber) {
         alert("Article Number is required.");
         return;
       }
-
       let column;
       if (km === 0) column = "local";
       else if (km <= 200) column = "upto200";
       else if (km <= 1000) column = "201-1000";
       else if (km <= 2000) column = "1001-2000";
       else column = "above2000";
-
       let rateRow = rates.find(r => weight <= r.weight);
       if (!rateRow) {
         alert("Weight exceeds supported range.");
         return;
       }
-
       calculatedAmount = rateRow[column];
       const sender = {
         first: document.getElementById("sender-first").value,
@@ -378,27 +396,22 @@
         pin: document.getElementById("recipient-pin").value,
         mobile: document.getElementById("recipient-mobile").value
       };
-
       bookingDetails = `
 Distance: ${km} km
 Postage Amount: ₹${calculatedAmount}
 Weight: ${weight} grams
-
 FROM:
 ${sender.first} ${sender.last}
 ${sender.addr}
 ${sender.city}, ${sender.state}
 PIN: ${sender.pin}, Mobile: ${sender.mobile}
-
 TO:
 ${recipient.first} ${recipient.last}
 ${recipient.addr}
 ${recipient.city}, ${recipient.state}
 PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
 `;
-
       detailsBox.innerText = bookingDetails;
-
       // Generate unique transaction note based on article number (only the number)
       generatedNote = articleNumber;
       const upiUrl = `upi://pay?pa=anantinamdar77@oksbi&pn=My%20Courier%20Service&am=${calculatedAmount}&cu=INR&tn=${encodeURIComponent(generatedNote)}`;
@@ -408,23 +421,18 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
         width: 220,
         height: 220
       });
-
       // Set payment amount in instruction text
       payAmountSpan.innerText = calculatedAmount;
-
       // Show note section after QR
       noteSection.style.display = 'block';
       noteInput.value = ''; // Clear input
       noteStatus.textContent = ''; // Clear status
-
       // Reset submit button and loading
       submitBtn.style.display = 'none';
       loadingSpinner.style.display = 'none';
-
       bookingForm.style.display = "none";
       resultMessage.style.display = "block";
     });
-
     // Handle note verification
     verifyNoteBtn.addEventListener('click', function() {
       const enteredNote = noteInput.value.trim();
@@ -439,12 +447,10 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
         noteStatus.style.color = 'red';
         return;
       }
-
       // Show loading
       loadingSpinner.style.display = 'block';
       verifyNoteBtn.disabled = true;
       noteStatus.textContent = '';
-
       // Simulate verification delay
       setTimeout(() => {
         loadingSpinner.style.display = 'none';
@@ -455,7 +461,6 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
         submitBtn.style.display = 'inline-block';
       }, 1500);
     });
-
     editBtn.addEventListener("click", function () {
       bookingForm.style.display = "block";
       resultMessage.style.display = "none";
@@ -464,8 +469,7 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
       loadingSpinner.style.display = "none";
       generatedNote = ''; // Reset for next session
     });
-    
-
+   
     submitBtn.addEventListener("click", function () {
       resultMessage.innerHTML = `
         <div class="tick">✔</div>
@@ -473,14 +477,12 @@ PIN: ${recipient.pin}, Mobile: ${recipient.mobile}
         <p>We'll contact you soon for pickup. Press <b>Enter</b> or click below for new booking.</p>
         <button id="fresh-btn" style="background:#007bff;color:white;padding:10px 20px;border:none;border-radius:5px;cursor:pointer;">New Booking</button>
       `;
-
       document.addEventListener("keydown", function handler(e) {
         if (e.key === "Enter") {
           window.location.reload();
           document.removeEventListener("keydown", handler);
         }
       });
-
       document.getElementById("fresh-btn").addEventListener("click", () => {
         window.location.reload();
       });
