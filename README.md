@@ -16,6 +16,18 @@ A **simple and intuitive Speed Post booking web application** deployed on **Verc
 ✅ Confirmation via UPI transaction note
 ✅ Simple and responsive UI
 
+
+
+## 🚀 Built With
+
+| Technology | Notes                    |
+| ---------- | ------------------------ |
+| HTML       | Structure of pages       |
+| CSS        | Styling                  |
+| JavaScript | Form logic & interaction |
+| Vercel     | Deployment platform      |
+
+---
 ---
 
 ## 📸 Screenshots
@@ -41,17 +53,6 @@ A **simple and intuitive Speed Post booking web application** deployed on **Verc
 
 <img width="1544" height="2748" alt="booking-website-v9ke vercel app_ (1)" src="https://github.com/user-attachments/assets/2b02c386-b1a8-4a23-a3ed-875ece5bdb4e" />
 
-
----
-
-## 🚀 Built With
-
-| Technology | Notes                    |
-| ---------- | ------------------------ |
-| HTML       | Structure of pages       |
-| CSS        | Styling                  |
-| JavaScript | Form logic & interaction |
-| Vercel     | Deployment platform      |
 
 ---
 
