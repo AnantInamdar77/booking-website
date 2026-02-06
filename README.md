@@ -32,9 +32,10 @@ A **simple and intuitive Speed Post booking web application** deployed on **Verc
 
 ## 📸 Screenshots
 
-> <img width="1544" height="1540" alt="booking-website-v9ke vercel app_ (2)" src="https://github.com/user-attachments/assets/b4455a24-6b01-4c75-b2f9-20b8d123fa09" />
+>
+ <img width="1544" height="2656" alt="booking-website-v9ke vercel app_" src="https://github.com/user-attachments/assets/6e92c27b-c164-4c4e-be47-04360bdfd57d" />
 <img width="1544" height="2748" alt="booking-website-v9ke vercel app_ (1)" src="https://github.com/user-attachments/assets/e25b792b-b3e0-48bd-9d22-85410f223c6e" />
-<img width="1544" height="2656" alt="booking-website-v9ke vercel app_" src="https://github.com/user-attachments/assets/6e92c27b-c164-4c4e-be47-04360bdfd57d" />
+<img width="1544" height="1540" alt="booking-website-v9ke vercel app_ (2)" src="https://github.com/user-attachments/assets/b4455a24-6b01-4c75-b2f9-20b8d123fa09" />
 
 
 
@@ -70,7 +71,6 @@ Go to the live deployed project here:
 📦booking-website
  ┣ 📜index.html
  ┣ 📜index3.html
- ┗ 📜README.md
 ```
 
 
